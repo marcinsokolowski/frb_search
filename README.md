@@ -16,9 +16,8 @@ Example usage:
 
    where "????_????" is the naming of the directories with dynamic spectra, -C is the width of indiviual fine channel, -B provides center frequency -E provide channel number.
 
-   The scripts calls program :
-
-     dynaspec_search ${fits} ${out_fits}  -o ${gps} -l $dm_min -m $dm_max -s ${dm_step} -n ${snr_threshold} ${options}
+   This scripts calls the program dynaspec_search which de-disperses a single dynamic spectrum resulting from the previous step:
+     dynaspec_search ${fits} ${out_fits}  -o ${gps} -l ${dm\_min} -m ${dm\_max} -s ${dm\_step} -n ${snr\_threshold} ${options}
 
 
 If you use this software for your work, please cite the paper: https://ui.adsabs.harvard.edu/abs/2021PASA...38...26A/abstract
