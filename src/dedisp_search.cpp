@@ -39,6 +39,23 @@ bool CDedispSearch::m_bForceOverwrite = false;
 bool CDedispSearch::m_bDebugDedispersion = false;
 double CDedispSearch::m_DebugDM = -1;
 
+static double my_dm_index_round( double dm_index )
+{
+   int dm_index_int = int(dm_index);
+   double frac = dm_index - dm_index_int;
+//   printf("DEBUG : frac = %.20f\n",frac);
+   
+   // <=0.5 -> int()
+   if (frac <= 0.50000000001 ){
+//      printf("??? BELOW 0.5 -> YES\n");
+      return dm_index_int;
+   }
+      
+   return round(dm_index);
+}
+
+
+
 int CDedispSearch::find_value_double( vector<double>& tab, double value, double error /*=0.000001*/ )
 {
         int pos=0;
@@ -1048,7 +1065,8 @@ int CDedispSearch::GetDedispersedSeries( CMWAFits& dynspec, CMWAFits& dedisperse
             // 2023-02-22 : was int() but this causes some DM rows to be ZERO !!!                                
 //            int out_dm_index = round( (dm-m_MinDM) / m_StepDM); // 2023-02-22 : was int() but this causes some DM rows to be ZERO !!!
             // 2023-07-17 : when changed in CalcTemplatesExact have to also change here:
-            int out_dm_index = round( (dm-m_MinDM-m_StepDM/2.00) / m_StepDM);
+            // 2024-12-03 : changing round -> my_dm_index_round so that 0.5 also goes down (int()) otherwise zero rows too !!!
+            int out_dm_index = my_dm_index_round( (dm-m_MinDM-m_StepDM/2.00) / m_StepDM);
 
             if( dm < LogBelowDM ){
                printf("\t -> %.4f (start at pixel (%d,%d) )\n",(sum_weighted),out_timeindex,out_dm_index);fflush(stdout);
@@ -1664,7 +1682,7 @@ int CDedispSearch::CalcTemplatesExact( CMWAFits& dynamic_spectrum )
    while( dm <= m_MaxDM ){
        bool bDebug=false;
        char szDM[16];
-       sprintf(szDM,"%06.1f",dm);
+       sprintf(szDM,"%06.2f",dm);
        CDispersedPixels dispersion_pixels, dispersion_pixels_all;
        printf("Filling template for DM = %s ( n_channels = %d  , %.6f - %.6f MHz )\n",szDM,n_channels,freq_upper_end_mhz,freq_lower_end_mhz);
        
