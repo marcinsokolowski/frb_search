@@ -488,7 +488,7 @@ int main(int argc,char* argv[])
      }
      
      FILE* outf2 = fopen("DM.txt","w");
-     fprintf(outf2,"%.8f %.8f\n",gUNIXTIME,best_dm);
+     fprintf(outf2,"%.8f %.8f %.4f\n",gUNIXTIME,best_dm,maxmaxsnr);
      fclose(outf2);
   }else{
      if( gTestDM > 0 ){
