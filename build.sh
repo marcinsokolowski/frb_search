@@ -75,9 +75,9 @@ make -j 12 VERBOSE=1
 
 # test:
 
-# echo "Create the modulefile in $MODULEFILE_DIR (or $INSTALL_DIR)"
-# export ADDITIONAL_MODULEFILE_COMMANDS="prepend_path('BLINK_IMAGER_PATH', root_dir )"
-# create_modulefile
+echo "Create the modulefile in $MODULEFILE_DIR (or $INSTALL_DIR)"
+export ADDITIONAL_MODULEFILE_COMMANDS="prepend_path('BLINK_IMAGER_PATH', root_dir )"
+create_modulefile
 
 echo "Done."
 
