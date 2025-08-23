@@ -26,7 +26,7 @@ echo "source ${BASH_UTILS_DIR}/build_utils.sh"
 source "${BASH_UTILS_DIR}/build_utils.sh"
 
 
-PROGRAM_NAME=frb-seaarch
+PROGRAM_NAME=frb-search
 PROGRAM_VERSION=main
 
 if [[ -n "$4" && "$4" != "-" ]]; then
@@ -71,7 +71,7 @@ cmake .. -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}  -DCMAKE_BUILD_TYPE=Release -DCMA
 make -j 12 VERBOSE=1
 # make test
 # Install the software
-# make install
+make install
 
 # test:
 
