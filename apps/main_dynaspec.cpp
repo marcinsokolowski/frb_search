@@ -327,6 +327,10 @@ void parse_cmdline(int argc, char * argv[]) {
          gStartFrequency = (gCoarseChannel*1.28);
       }
    }
+   
+   if( gInputFitsFilesTypes == eBlinkImager ){
+      gCoarseChannels = gCoarseChannels*24;
+   }
 }
  
 
