@@ -1297,13 +1297,20 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
    
    printf("DEBUG : ReadBlinkImages time_steps_per_second = %d -> total time steps = %d , m_Channels = %d , fine_channels = %d\n",time_steps_per_second,m_Timesteps,m_Channels,n_fine_channels);
    printf("DEBUG : template = %s\n",image_template);
+   
+   for(int ch=0;ch<m_Channels;ch++){
+      if( ((*this)[ch][0]) ){
+         printf("ERROR in code Cube already initialised earlier ???\n");
+         return -1;
+      }
+   }
 
    int second=first_second; // TODO : needs to increase after full second added !!!
    int t = timestep;
-         int total_fine_channel = 0;
          for(int cc=first_coarse_channel;cc<(first_coarse_channel+24);cc++){
              for(int ch=0;ch<n_fine_channels;ch++){
                 sprintf(szObsidFile,"obsid.txt");
+                int total_fine_channel = (cc-first_coarse_channel)*n_fine_channels + ch;
        
                  CMWAFits* pBgFits = new CMWAFits();
                  if( !pBgFits ){
@@ -1359,9 +1366,7 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
                  }else{
                      printf("\tERROR : file %s does not exist or could not be read\n",szFullFitsPath);
                      delete pBgFits;
-                 }
-                 
-                 total_fine_channel++;  
+                 }                 
              }
           }
 
