@@ -468,8 +468,10 @@ int main(int argc,char* argv[])
            read_images = cube.ReadChanTime( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str(), false );
         }else{       
            if( gInputFitsFilesTypes == eBlinkImager ){
+              int timesteps_per_second = int(round(1.00/gTimeResolutionInSec));
               int second = gFirstSecondToProcess + int(start_timeindex*gTimeResolutionInSec);
-              read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, second, gCoarseChannel, 24 );
+              int timestep = (start_timeindex % timesteps_per_second);
+              read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), timestep, gTimeResolutionInSec, second, gCoarseChannel, 24 );
            }else{
               read_images = cube.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str(), false );
            }
