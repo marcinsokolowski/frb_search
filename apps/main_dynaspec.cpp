@@ -396,7 +396,10 @@ int main(int argc,char* argv[])
 //  int n_images = frb_search.m_MWADataCube.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str() );
 //  int events_count = frb_search.Run( gThresholdInSigma, gBorder, 6 );
 
-  int check_image = 1;
+  int check_image = 10;
+  if( gInputFitsFilesTypes == eBlinkImager ){
+     check_image = 0;
+  }
   CMWADataCube cube_first( gObsID, gCoarseChannels, check_image ); // was 1 but usually does not exist so 10 should be safe !
   int read_images = 0;
   
@@ -415,7 +418,7 @@ int main(int argc,char* argv[])
   }else{
      if( gInputFitsFilesTypes == eBlinkImager ){
         int n_seconds = int(round(gTimeSteps*gTimeResolutionInSec));
-        read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, gFirstSecondToProcess, gCoarseChannel, 24 );
+        read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), 0, gTimeResolutionInSec, gFirstSecondToProcess, gCoarseChannel, 24 );
      }else{
         read_images = cube_first.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str() );
      }
