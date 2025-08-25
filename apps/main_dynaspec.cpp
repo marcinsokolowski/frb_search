@@ -527,12 +527,11 @@ int main(int argc,char* argv[])
                               value = 0.00/0.00; // WARNING : FP_NAN does not really do anything but set 0.00
                            }
                         }
+                        pDynaSpec->setXY( start_timeindex, channel, value );
                      }else{
                         printf("ERROR in code : trying to access uninitialised channel %d\n",channel);
                         exit(-1);
                      }
-                     
-                     pDynaSpec->setXY( start_timeindex, channel, value ); 
                   }else{
                      printf("ERROR : dynamic spectrum at pixel (%d,%d) has not been allocated - skipped\n",x,y);
                   }
