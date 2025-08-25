@@ -520,11 +520,16 @@ int main(int argc,char* argv[])
                   CMWAFits* pDynaSpec = (dynaspec_map[y][x]);
            
                   if( pDynaSpec ){
-                     double value = (cube[channel][0])->getXY(x,y); // cube has just one image for given channel and timestep - no need to [channel][start_timeindex]
-                     if( gZeros2NaNs ){
-                        if( value == 0.00 || fabs(value) < gZeroDistanceThreshold ){ // if 0 or consistent with 0.00 - floats and doubles might be tricky in this respect 
-                           value = 0.00/0.00; // WARNING : FP_NAN does not really do anything but set 0.00
+                     if( cube[channel][0] ){                  
+                        double value = (cube[channel][0])->getXY(x,y); // cube has just one image for given channel and timestep - no need to [channel][start_timeindex]
+                        if( gZeros2NaNs ){
+                           if( value == 0.00 || fabs(value) < gZeroDistanceThreshold ){ // if 0 or consistent with 0.00 - floats and doubles might be tricky in this respect 
+                              value = 0.00/0.00; // WARNING : FP_NAN does not really do anything but set 0.00
+                           }
                         }
+                     }else{
+                        printf("ERROR in code : trying to access uninitialised channel %d\n",channel);
+                        exit(-1);
                      }
                      
                      pDynaSpec->setXY( start_timeindex, channel, value ); 
