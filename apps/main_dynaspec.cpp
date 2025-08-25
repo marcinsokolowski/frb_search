@@ -33,6 +33,7 @@ int gTimeSteps=-1;    // 592;
 int gStartTimeIndex=0; 
 double gTimeResolutionInSec=0.5;
 int gObsID=1192530256;
+int gFirstSecondToProcess=0;
 double gThresholdInSigma=10;
 int gBorder=20;
 mystring gSubDirTemplate="wsclean_timeindex%03d";
@@ -61,7 +62,8 @@ void usage()
    printf("Description : program reads multiple images (in time and frequency) and saves resulting dynamic spectra to separate FITS files (for each image pixel)\n");
 //    -n THRESHOLD_IN_SIGMA -b BORDER -a ENABLE_ALGO_TYPE -d OUTDIR -o OBSID -f FITS_FILENAME_TEMPLATE -r MAX_ALLOWED_RMS -D\n");   
    printf("\t-P option for reading PaCER BLINK images as they are in the format : start_time_1508442495_int_49_coarse_131_fine_ch00_image_real.fits\n");
-   printf("\t-S START_TIME_INDEX : default = %d\n",gStartTimeIndex);   
+// OLD - not used:  printf("\t-S START_TIME_INDEX : default = %d\n",gStartTimeIndex);   
+   printf("\t-S FIRST_SECOND_TO_PROCESS for BLINK images : default = %d\n",gFirstSecondToProcess);
    printf("\t-t TIME_STEPS : set <=0 to analyse all available timesteps\n");
    printf("\t-w (x_start,y_start)-(x_end,y_end) - do dump dynamic spectra of all pixels in this window\n");
    printf("\t-p (X,Y) - to dump a single pixel [default center pixel]\n");
@@ -230,7 +232,8 @@ void parse_cmdline(int argc, char * argv[]) {
 
          case 'S':
             if( optarg ){
-               gStartTimeIndex = atol( optarg );
+               // OLD NOT USED : gStartTimeIndex = atol( optarg );
+               gFirstSecondToProcess = atol( optarg );
             }
             break;
 
@@ -333,7 +336,8 @@ void print_parameters()
    printf("PARAMETERS :\n");
    printf("#####################################\n");
    printf("Telescope type   = %d\n",gTelescopeType);
-   printf("Start time index = %d\n",gStartTimeIndex);
+//   printf("Start time index = %d\n",gStartTimeIndex);
+   printf("First second to process = %d\n",gFirstSecondToProcess);
    printf("Skip first images = %d\n",CDedispSearch::m_SkipTimeSteps);
    if( gDumpSinglePixel ){
       printf("Dump window = (%d,%d) - (%d,%d)\n",gBorderStartX,gBorderStartY,gBorderEndX,gBorderEndY);
@@ -411,7 +415,7 @@ int main(int argc,char* argv[])
   }else{
      if( gInputFitsFilesTypes == eBlinkImager ){
         int n_seconds = int(round(gTimeSteps*gTimeResolutionInSec));
-        read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, n_seconds, gCoarseChannel, 24 );
+        read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, n_seconds, gFirstSecondToProcess, gCoarseChannel, 24 );
      }else{
         read_images = cube_first.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str() );
      }
