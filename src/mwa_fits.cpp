@@ -1340,14 +1340,14 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
 
            
                  if( MyFile::DoesFileExist( szFullFitsPath ) && (pBgFits->m_ReadStatus = pBgFits->ReadFits( szFullFitsPath, bAutoDetect ))==0 ){
-                     ((*this)[ch][t]) = pBgFits;
+                     ((*this)[total_fine_channel][t]) = pBgFits;
                
                      x_size = pBgFits->GetXSize();
                      y_size = pBgFits->GetYSize();               
                
                      if( m_FirstCorrectTimestep < 0 && m_FirstCorrectChannel < 0 ){
                          m_FirstCorrectTimestep = t; // 20190822 - to only use m_StartTimeIndex for reading from the disk and writing results 
-                         m_FirstCorrectChannel  = ch;
+                         m_FirstCorrectChannel  = total_fine_channel;
                          printf("AUTO-ACTION : first timestep with correctly read image is %d, channel = %d, image size = (%d,%d), this = %p\n",m_FirstCorrectTimestep,m_FirstCorrectChannel,x_size,y_size,this);
                      }
                  
@@ -1356,6 +1356,8 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
                      printf("\tERROR : file %s does not exist or could not be read\n",szFullFitsPath);
                      delete pBgFits;
                  }
+                 
+                 total_fine_channel++;  
              }
           }
 
