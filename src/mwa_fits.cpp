@@ -1306,7 +1306,8 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
    }
 
    int second=first_second; // TODO : needs to increase after full second added !!!
-   int t = timestep;
+//   int t = timestep;
+//   int t = 0; // only 1 timestep !!!
          for(int cc=first_coarse_channel;cc<(first_coarse_channel+24);cc++){
              for(int ch=0;ch<n_fine_channels;ch++){
                 sprintf(szObsidFile,"obsid.txt");
@@ -1327,10 +1328,10 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
                     printf("DEBUG : read obsid = %d from fitsfile\n",pBgFits->m_Obsid);
                  } 
             
-                 sprintf(szFitsFilename,image_template,second,t,cc,ch);
+                 sprintf(szFitsFilename,image_template,second,timestep,cc,ch);
                  sprintf(szFullFitsPath,"%s/%s",szDir,szFitsFilename);
            
-                 printf("Reading timestep = %d/%d , coarse channel %d, channel = %d (total fine channel = %d)-> fits = %s , fits-obsid = %d\n",second,t,cc,ch,total_fine_channel,szFullFitsPath,pBgFits->m_Obsid);
+                 printf("Reading timestep = %d/%d , coarse channel %d, channel = %d (total fine channel = %d)-> fits = %s , fits-obsid = %d\n",second,timestep,cc,ch,total_fine_channel,szFullFitsPath,pBgFits->m_Obsid);
            
                  if( !MyFile::DoesFileExist( szFullFitsPath ) ){
                     mystring szFirstPath = szFullFitsPath;              
@@ -1340,24 +1341,24 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
                        printf("WARNING : reading compressed file %s\n",szGzippedFile.c_str());
                        sprintf(szFullFitsPath,"%s",szGzippedFile.c_str());                 
                     }else{
-                       sprintf(szFullFitsPath,"%s/wsclean_%d_timeindex%d-%04d-I-dirty.fits",szDir,m_Obsid,t,ch);                  
+                       sprintf(szFullFitsPath,"%s/wsclean_%d_timeindex%d-%04d-I-dirty.fits",szDir,m_Obsid,timestep,ch);                  
                        printf("WARNING : image %s could not be read -> trying old template %s ... \n",szFirstPath.c_str(),szFullFitsPath);
                     }
                  }
 
            
                  if( MyFile::DoesFileExist( szFullFitsPath ) && (pBgFits->m_ReadStatus = pBgFits->ReadFits( szFullFitsPath, bAutoDetect ))==0 ){
-                     if( ((*this)[total_fine_channel][t]) ){
-                        printf("ERROR in code : channel = %d and timestep = %d already filled !!! Skipped now\n",total_fine_channel,t);
+                     if( ((*this)[total_fine_channel][0]) ){
+                        printf("ERROR in code : channel = %d and timestep = %d already filled !!! Skipped now\n",total_fine_channel,0);
                      }else{                     
-                        ((*this)[total_fine_channel][t]) = pBgFits;
+                        ((*this)[total_fine_channel][0]) = pBgFits;
                      }
                
                      x_size = pBgFits->GetXSize();
                      y_size = pBgFits->GetYSize();               
                
                      if( m_FirstCorrectTimestep < 0 && m_FirstCorrectChannel < 0 ){
-                         m_FirstCorrectTimestep = t; // 20190822 - to only use m_StartTimeIndex for reading from the disk and writing results 
+                         m_FirstCorrectTimestep = 0; // 20190822 - to only use m_StartTimeIndex for reading from the disk and writing results 
                          m_FirstCorrectChannel  = total_fine_channel;
                          printf("AUTO-ACTION : first timestep with correctly read image is %d, channel = %d, image size = (%d,%d), this = %p\n",m_FirstCorrectTimestep,m_FirstCorrectChannel,x_size,y_size,this);
                      }
