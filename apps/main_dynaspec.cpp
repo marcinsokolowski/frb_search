@@ -398,7 +398,7 @@ int main(int argc,char* argv[])
 
   int check_image = 10;
   if( gInputFitsFilesTypes == eBlinkImager ){
-     check_image = 0;
+     check_image = 1;
   }
   CMWADataCube cube_first( gObsID, gCoarseChannels, check_image ); // was 1 but usually does not exist so 10 should be safe !
   int read_images = 0;
