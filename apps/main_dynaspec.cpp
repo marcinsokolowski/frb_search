@@ -330,6 +330,7 @@ void parse_cmdline(int argc, char * argv[]) {
    
    if( gInputFitsFilesTypes == eBlinkImager ){
       gCoarseChannels = gCoarseChannels*24;
+      MWA_COARSE_CHANNELS = gCoarseChannels;
    }
 }
  

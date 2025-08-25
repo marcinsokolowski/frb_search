@@ -1293,15 +1293,16 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
    int read_images = 0;
 
    int time_steps_per_second = int(round(1.00/time_resolution));
+   int n_fine_channels = int(m_Channels / 24 );
    
-   printf("DEBUG : ReadBlinkImages time_steps_per_second = %d -> total time steps = %d\n",time_steps_per_second,m_Timesteps);
+   printf("DEBUG : ReadBlinkImages time_steps_per_second = %d -> total time steps = %d , m_Channels = %d , fine_channels = %d\n",time_steps_per_second,m_Timesteps,m_Channels,n_fine_channels);
    printf("DEBUG : template = %s\n",image_template);
 
    int second=first_second; // TODO : needs to increase after full second added !!!
    int t = timestep;
          int total_fine_channel = 0;
          for(int cc=first_coarse_channel;cc<(first_coarse_channel+24);cc++){
-             for(int ch=0;ch<m_Channels;ch++){
+             for(int ch=0;ch<n_fine_channels;ch++){
                 sprintf(szObsidFile,"obsid.txt");
        
                  CMWAFits* pBgFits = new CMWAFits();
