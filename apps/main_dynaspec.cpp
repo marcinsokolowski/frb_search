@@ -415,7 +415,7 @@ int main(int argc,char* argv[])
   }else{
      if( gInputFitsFilesTypes == eBlinkImager ){
         int n_seconds = int(round(gTimeSteps*gTimeResolutionInSec));
-        read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, n_seconds, gFirstSecondToProcess, gCoarseChannel, 24 );
+        read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, gFirstSecondToProcess, gCoarseChannel, 24 );
      }else{
         read_images = cube_first.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str() );
      }
@@ -469,7 +469,8 @@ int main(int argc,char* argv[])
         }else{       
            if( gInputFitsFilesTypes == eBlinkImager ){
               int n_seconds = int(round(gTimeSteps*gTimeResolutionInSec));
-              read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, n_seconds, gCoarseChannel, 24 );
+              int second = gFirstSecondToProcess + int(start_timeindex*gTimeResolutionInSec);
+              read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, second, gCoarseChannel, 24 );
            }else{
               read_images = cube.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str(), false );
            }

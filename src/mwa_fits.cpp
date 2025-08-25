@@ -1279,7 +1279,6 @@ int CMWADataCube::ReadChanTime( const char* dir_template /*="%05d"*/,  // channe
 
 int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_timeindex%03d-%04d-I-dirty.fits"*/
                      double time_resolution,
-                     int n_seconds,
                      int first_second,
                      int first_coarse_channel, 
                      int n_coarse_channels,
@@ -1294,14 +1293,11 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
 
    int time_steps_per_second = int(round(1.00/time_resolution));
    
-   int newTimesteps = (n_seconds*time_steps_per_second);
-   printf("DEBUG : ReadBlinkImages time_steps_per_second = %d -> total time steps = %d (was %d)\n",time_steps_per_second,newTimesteps,m_Timesteps);
+   printf("DEBUG : ReadBlinkImages time_steps_per_second = %d -> total time steps = %d\n",time_steps_per_second,m_Timesteps);
    printf("DEBUG : template = %s\n",image_template);
-   m_Timesteps = newTimesteps;
 
    int second=first_second; // TODO : needs to increase after full second added !!!
-   for(int second=first_second;second<(first_second+n_seconds);second++){
-      for(int t=0;t<(m_Timesteps);t++){ // 50 for 20ms 
+   for(int t=0;t<(m_Timesteps);t++){ // 50 for 20ms 
          int total_fine_channel = 0;
          for(int cc=first_coarse_channel;cc<(first_coarse_channel+24);cc++){
              for(int ch=0;ch<m_Channels;ch++){
@@ -1360,8 +1356,7 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
                  }
              }
           }
-      }      
-   }
+   }      
 
    if( read_images <= 0 ){
       if( bExitOnReadError ){

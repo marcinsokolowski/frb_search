@@ -177,7 +177,6 @@ public :
                    
    int ReadBlinkImages( const char* image_template, // ="wsclean_%d_timeindex%03d-%04d-I-dirty.fits", 
                         double time_resolution,
-                        int n_seconds,
                         int first_second,
                         int first_coarse_channel, 
                         int n_coarse_channels=24, 
