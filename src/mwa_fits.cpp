@@ -1349,6 +1349,9 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
 
            
                  if( MyFile::DoesFileExist( szFullFitsPath ) && (pBgFits->m_ReadStatus = pBgFits->ReadFits( szFullFitsPath, bAutoDetect ))==0 ){
+// TO DEBUG :
+//                  if( MyFile::DoesFileExist( szFullFitsPath ) ){
+//                     pBgFits->Realloc(1000,1000);
                      if( ((*this)[total_fine_channel][0]) ){
                         printf("ERROR in code : channel = %d and timestep = %d already filled !!! Skipped now\n",total_fine_channel,0);
                      }else{                     
