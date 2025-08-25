@@ -1296,6 +1296,7 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
    
    int newTimesteps = (n_seconds*time_steps_per_second);
    printf("DEBUG : ReadBlinkImages time_steps_per_second = %d -> total time steps = %d (was %d)\n",time_steps_per_second,newTimesteps,m_Timesteps);
+   printf("DEBUG : template = %s\n",image_template);
    m_Timesteps = newTimesteps;
 
    int second=first_second; // TODO : needs to increase after full second added !!!
@@ -1324,7 +1325,7 @@ int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_ti
                  sprintf(szFitsFilename,image_template,second,t,cc,ch);
                  sprintf(szFullFitsPath,"%s/%s",szDir,szFitsFilename);
            
-                 printf("Reading timestep = %d , coarse channel %d, channel = %d (total fine channel = %d)-> fits = %s , fits-obsid = %d\n",t,cc,ch,total_fine_channel,szFullFitsPath,pBgFits->m_Obsid);
+                 printf("Reading timestep = %d/%d , coarse channel %d, channel = %d (total fine channel = %d)-> fits = %s , fits-obsid = %d\n",second,t,cc,ch,total_fine_channel,szFullFitsPath,pBgFits->m_Obsid);
            
                  if( !MyFile::DoesFileExist( szFullFitsPath ) ){
                     mystring szFirstPath = szFullFitsPath;              
