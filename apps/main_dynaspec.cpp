@@ -51,13 +51,16 @@ double gZeroDistanceThreshold = 1e-9;
 extern int gDebugLocal;
 
 // order of channels / time directory structure :
-bool gChannelDirFirst=false;
+enum eInputFitsFilesTypes  { eChannelDirFirst=0, eDefaultMWAFiles=1, eBlinkImager=2 };
+// bool gChannelDirFirst=false;
+eInputFitsFilesTypes gInputFitsFilesTypes = eDefaultMWAFiles;
 
 void usage()
 {
    printf("create_dynaspec -t TIME_STEPS -w (x_start,y_start)-(x_end,y_end) -p (X,Y)\n");
    printf("Description : program reads multiple images (in time and frequency) and saves resulting dynamic spectra to separate FITS files (for each image pixel)\n");
 //    -n THRESHOLD_IN_SIGMA -b BORDER -a ENABLE_ALGO_TYPE -d OUTDIR -o OBSID -f FITS_FILENAME_TEMPLATE -r MAX_ALLOWED_RMS -D\n");   
+   printf("\t-P option for reading PaCER BLINK images as they are in the format : start_time_1508442495_int_49_coarse_131_fine_ch00_image_real.fits\n");
    printf("\t-S START_TIME_INDEX : default = %d\n",gStartTimeIndex);   
    printf("\t-t TIME_STEPS : set <=0 to analyse all available timesteps\n");
    printf("\t-w (x_start,y_start)-(x_end,y_end) - do dump dynamic spectra of all pixels in this window\n");
@@ -85,7 +88,7 @@ void usage()
 
 
 void parse_cmdline(int argc, char * argv[]) {
-   char optstring[] = "ho:l:m:s:t:n:b:a:d:c:f:vr:R:S:T:x:D:w:p:C:X:FN:A:B:I:";
+   char optstring[] = "ho:l:m:s:t:n:b:a:d:c:f:vr:R:S:T:x:D:w:p:C:X:FN:A:B:I:P";
    int opt,opt_param,i;
         
    while ((opt = getopt(argc, argv, optstring)) != -1) {
@@ -149,7 +152,8 @@ void parse_cmdline(int argc, char * argv[]) {
             break;
 
           case 'F':
-            gChannelDirFirst = true;
+            // gChannelDirFirst = true;
+            gInputFitsFilesTypes = eChannelDirFirst;
             break;
 
           case 'o':
@@ -331,7 +335,8 @@ void print_parameters()
    }else{
       printf("Dump single pixel = (%d,%d)\n",gBorderStartX,gBorderStartY);
    }
-   printf("Channel dir first = %d\n",gChannelDirFirst);
+   printf("Input FITS files format = %d\n",int(gInputFitsFilesTypes));
+   printf("\tOLD OPTION ;: Channel dir first = %d\n", (gInputFitsFilesTypes==eChannelDirFirst));
    printf("Number of freq. channels = %d\n",gCoarseChannels);
    printf("ObsID     = %d\n",gObsID);   
 
@@ -386,7 +391,7 @@ int main(int argc,char* argv[])
   CMWADataCube cube_first( gObsID, gCoarseChannels, check_image ); // was 1 but usually does not exist so 10 should be safe !
   int read_images = 0;
   
-  if( gChannelDirFirst ){
+  if( gInputFitsFilesTypes == eChannelDirFirst ){
      if( gTimeSteps < 0 ){
         std::vector<string> channel_fits_list;
         char szFitsList[128];
@@ -399,7 +404,12 @@ int main(int argc,char* argv[])
   
      read_images = cube_first.ReadChanTime( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str() );
   }else{
-     read_images = cube_first.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str() );
+     if( gInputFitsFilesTypes == eBlinkImager ){
+        int n_seconds = int(round(gTimeSteps*gTimeResolutionInSec));
+        read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, n_seconds, gCoarseChannel, 24 );
+     }else{
+        read_images = cube_first.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str() );
+     }
   }
   
   if( read_images > 0 ){
@@ -445,10 +455,15 @@ int main(int argc,char* argv[])
         CMWADataCube cube( gObsID, gCoarseChannels, 1, start_timeindex );
         
         int read_images = 0;
-        if( gChannelDirFirst ){
+        if( gInputFitsFilesTypes == eChannelDirFirst ){
            read_images = cube.ReadChanTime( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str(), false );
         }else{       
-           read_images = cube.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str(), false );
+           if( gInputFitsFilesTypes == eBlinkImager ){
+              int n_seconds = int(round(gTimeSteps*gTimeResolutionInSec));
+              read_images = cube_first.ReadBlinkImages( gImageFileNameTemplate.c_str(), gTimeResolutionInSec, n_seconds, gCoarseChannel, 24 );
+           }else{
+              read_images = cube.Read( gSubDirTemplate.c_str() , gImageFileNameTemplate.c_str(), false );
+           }
         }
         
         CMWAFits* pImage = cube.GetImage( 0, 0 );

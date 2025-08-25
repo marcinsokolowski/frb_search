@@ -27,7 +27,7 @@ source "${BASH_UTILS_DIR}/build_utils.sh"
 
 
 PROGRAM_NAME=frb-search
-PROGRAM_VERSION=main
+PROGRAM_VERSION=devel
 
 if [[ -n "$4" && "$4" != "-" ]]; then
    PROGRAM_VERSION="$4"

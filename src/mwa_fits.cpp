@@ -130,7 +130,7 @@ int CMWAFits::FindSources( double threshold_in_sigma, int border, const char* sz
                            int max_count_param /*=-1*/
                          )
 {
-   printf("PROGRESS CMWAFits::FindSources size %d x %d, PARAMS : max_count_param = %d\n",GetXSize(),GetYSize(),max_count_param);
+   printf("PROGRESS CMWAFits::FindSources size %d x %d, PARAMS : max_count_param = %d\n",int(GetXSize()),int(GetYSize()),max_count_param);
   
    GetStat( border );
 
@@ -151,7 +151,7 @@ int CMWAFits::FindSources( double threshold_in_sigma, int border, const char* sz
    
    if( pCountMap ){
       if( m_SizeX != pCountMap->GetXSize() || m_SizeY != pCountMap->GetYSize() ){
-         printf("ERROR : size of the de-dispersed series and count pixel map have to be the same they are not (%d,%d) != (%d,%d)\n",m_SizeX,m_SizeY,pCountMap->GetXSize(),pCountMap->GetYSize());
+         printf("ERROR : size of the de-dispersed series and count pixel map have to be the same they are not (%d,%d) != (%d,%d)\n",int(m_SizeX),int(m_SizeY),int(pCountMap->GetXSize()),int(pCountMap->GetYSize()));
          exit(-1);
       }
 
@@ -159,7 +159,7 @@ int CMWAFits::FindSources( double threshold_in_sigma, int border, const char* sz
       if( max_count_param > 0 ){
          max_count = max_count_param;
       }
-      printf("Calculating RMS per number of pixels in the map, max_count = %d ( = %d + %d )\n",max_count,m_SizeX,m_SizeY);fflush(stdout);
+      printf("Calculating RMS per number of pixels in the map, max_count = %d ( = %d + %d )\n",max_count,int(m_SizeX),int(m_SizeY));fflush(stdout);
       int last_zeros = 0;
       int init_rms_count = max_count+5;
       if( p_rms_per_count ){
@@ -347,7 +347,7 @@ int CMWAFits::FindSources( double threshold_in_sigma, int border, const char* sz
 
 int CMWAFits::FindSourcesSNR( double threshold_snr /* =5.00 */, int border /* = 20 */ , const char* szOutRegFile /* ="sources_snr.reg" */ , int minX /* =0 */, int maxX /* =-1 */ , CBgFits* pCountMap /*=NULL*/ , bool bSavePhysical /*=false*/ )
 {
-   printf("PROGRESS CMWAFits::FindSourcesSNR size %d x %d, PARAMS : border = %d\n",GetXSize(),GetYSize(),border);
+   printf("PROGRESS CMWAFits::FindSourcesSNR size %d x %d, PARAMS : border = %d\n",int(GetXSize()),int(GetYSize()),border);
 
    m_Sources.clear();
 
@@ -494,7 +494,7 @@ int CMWAFits::CutValues( double threshold_in_sigma, vector<int>& good_columns, d
        }
    }
    
-   printf("CutValues : accpeted %d our of %d pixels\n",count,(GetXSize()*GetYSize()));
+   printf("CutValues : accpeted %d our of %d pixels\n",count,int(GetXSize()*GetYSize()));
    
    return count;
 }
@@ -968,7 +968,7 @@ bool CMWADataCube::Operation( CMWADataCube& right , eCalcFitsAction_T oper )
          }
          
          if( pImageLeft->GetXSize() != pImageRight->GetXSize() || pImageLeft->GetYSize() != pImageRight->GetYSize() ){
-            printf("ERROR : image dimenssion not the same %d != %d or %d != %d at channel = %d , timestep = %d\n",pImageLeft->GetXSize(),pImageRight->GetXSize(),pImageLeft->GetYSize(),pImageRight->GetYSize(),ch,t);
+            printf("ERROR : image dimenssion not the same %d != %d or %d != %d at channel = %d , timestep = %d\n",int(pImageLeft->GetXSize()),int(pImageRight->GetXSize()),int(pImageLeft->GetYSize()),int(pImageRight->GetYSize()),ch,t);
             return false;
          }
          
@@ -1276,6 +1276,125 @@ int CMWADataCube::ReadChanTime( const char* dir_template /*="%05d"*/,  // channe
    return read_images;
 }                              
 
+
+int CMWADataCube::ReadBlinkImages( const char* image_template, /*="wsclean_%d_timeindex%03d-%04d-I-dirty.fits"*/
+                     double time_resolution,
+                     int n_seconds,
+                     int first_second,
+                     int first_coarse_channel, 
+                     int n_coarse_channels,
+                     const char* szDir, /* = "./" */
+                     bool bExitOnReadError /* = true */ )
+{
+   char szFitsFilename[1024],szFullFitsPath[2048],szObsidFile[1064];
+   int bAutoDetect=1;
+   int x_size = -1;
+   int y_size = -1;
+   int read_images = 0;
+
+   int time_steps_per_second = int(round(1.00/time_resolution));
+   
+   int newTimesteps = (n_seconds*time_steps_per_second);
+   printf("DEBUG : ReadBlinkImages time_steps_per_second = %d -> total time steps = %d (was %d)\n",time_steps_per_second,newTimesteps,m_Timesteps);
+   m_Timesteps = newTimesteps;
+
+   int second=first_second; // TODO : needs to increase after full second added !!!
+   for(int second=first_second;second<(first_second+n_seconds);second++){
+      for(int t=0;t<(m_Timesteps);t++){ // 50 for 20ms 
+         int total_fine_channel = 0;
+         for(int cc=first_coarse_channel;cc<(first_coarse_channel+24);cc++){
+             for(int ch=0;ch<m_Channels;ch++){
+                sprintf(szObsidFile,"obsid.txt");
+       
+                 CMWAFits* pBgFits = new CMWAFits();
+                 if( !pBgFits ){
+                    printf("ERROR : could not allocate memory for object of class CMWAFits\n");
+                    exit(-1);
+                 }
+           
+                 pBgFits->m_Obsid = m_Obsid;
+                 if( MyFile::DoesFileExist( szObsidFile )) {
+                    MyFile obsid_file( szObsidFile );
+                    const char* pLine = obsid_file.GetLine(TRUE);
+                    pBgFits->m_Obsid = atol( pLine );              
+                    m_Obsid = pBgFits->m_Obsid;
+                    printf("DEBUG : read obsid = %d from fitsfile\n",pBgFits->m_Obsid);
+                 } 
+            
+                 sprintf(szFitsFilename,image_template,second,t,cc,ch);
+                 sprintf(szFullFitsPath,"%s/%s",szDir,szFitsFilename);
+           
+                 printf("Reading timestep = %d , coarse channel %d, channel = %d (total fine channel = %d)-> fits = %s , fits-obsid = %d\n",t,cc,ch,total_fine_channel,szFullFitsPath,pBgFits->m_Obsid);
+           
+                 if( !MyFile::DoesFileExist( szFullFitsPath ) ){
+                    mystring szFirstPath = szFullFitsPath;              
+                    mystring szGzippedFile = szFirstPath.c_str();
+                    szGzippedFile += ".gz";
+                    if ( MyFile::DoesFileExist( szGzippedFile.c_str() ) ){
+                       printf("WARNING : reading compressed file %s\n",szGzippedFile.c_str());
+                       sprintf(szFullFitsPath,"%s",szGzippedFile.c_str());                 
+                    }else{
+                       sprintf(szFullFitsPath,"%s/wsclean_%d_timeindex%d-%04d-I-dirty.fits",szDir,m_Obsid,t,ch);                  
+                       printf("WARNING : image %s could not be read -> trying old template %s ... \n",szFirstPath.c_str(),szFullFitsPath);
+                    }
+                 }
+
+           
+                 if( MyFile::DoesFileExist( szFullFitsPath ) && (pBgFits->m_ReadStatus = pBgFits->ReadFits( szFullFitsPath, bAutoDetect ))==0 ){
+                     ((*this)[ch][t]) = pBgFits;
+               
+                     x_size = pBgFits->GetXSize();
+                     y_size = pBgFits->GetYSize();               
+               
+                     if( m_FirstCorrectTimestep < 0 && m_FirstCorrectChannel < 0 ){
+                         m_FirstCorrectTimestep = t; // 20190822 - to only use m_StartTimeIndex for reading from the disk and writing results 
+                         m_FirstCorrectChannel  = ch;
+                         printf("AUTO-ACTION : first timestep with correctly read image is %d, channel = %d, image size = (%d,%d), this = %p\n",m_FirstCorrectTimestep,m_FirstCorrectChannel,x_size,y_size,this);
+                     }
+                 
+                     read_images++;
+                 }else{
+                     printf("\tERROR : file %s does not exist or could not be read\n",szFullFitsPath);
+                     delete pBgFits;
+                 }
+             }
+          }
+      }      
+   }
+
+   if( read_images <= 0 ){
+      if( bExitOnReadError ){
+         printf("ERROR : could not read any image for obsID = %d -> exiting program\n",m_Obsid);
+         exit(-1);      
+      }else{
+         printf("WARNING : could not read any image for obsID = %d -> returning from Read function (no exit required)\n",m_Obsid);
+      }
+   }
+   
+/*   if( m_Timesteps <= 0 ){
+      printf("AUTO-ACTION : setting m_Timesteps := %d (was <=0 - which requires auto-action)\n",t);
+      m_Timesteps = t;
+   }*/
+   
+   DebugDump( eDumpType_CenterPixel );
+   
+   if( !ReadMetaData( m_Obsid ) ){
+      printf("ERROR : could not read metadata for obsid = %d\n",m_Obsid);
+      exit(-1);
+   }
+   
+//   printf("INFO : unixtime = %d\n",m_Metafits->dtime_fs); 
+   printf("INFO : unixtime = %.2f (from gpstime = %d)\n",m_StartUnixTime,m_Obsid);
+
+   if( x_size >0 && y_size>0 ){   
+       m_pMeanImage = new CMWAFits( "mean.fits", x_size, y_size );
+       m_pRMSImage = new CMWAFits( "rms.fits", x_size, y_size );
+       m_pMedianImage = new CMWAFits( "median.fits", x_size, y_size );
+   }
+   
+   return read_images;
+
+}                     
 
 int CMWADataCube::Read( const char* dir_template,  /* ="wsclean_timeindex%03d" */
                         const char* image_template, /* ="wsclean_%d_timeindex%03d-%04d-I-dirty.fits"*/ 
