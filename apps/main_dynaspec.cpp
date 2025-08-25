@@ -552,7 +552,8 @@ int main(int argc,char* argv[])
                pFits->MeanLines( mean_spectrum , rms_spectrum );
                char szOutMeanSpectrum[1024];
                sprintf(szOutMeanSpectrum,"%s/%04d_%04d.mean_spectrum",gOutputDir.c_str(),x,y);
-               mean_spectrum.SaveToFile( szOutMeanSpectrum, NULL, &rms_spectrum );
+// TODO : This line causes a crash - at least in this version of the code !!!???
+//               mean_spectrum.SaveToFile( szOutMeanSpectrum, NULL, &rms_spectrum );
                printf("Saved mean spectrum to file %s\n",szOutMeanSpectrum);               
                                           
                char szFileName[1024];
