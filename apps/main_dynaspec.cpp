@@ -156,6 +156,11 @@ void parse_cmdline(int argc, char * argv[]) {
             gInputFitsFilesTypes = eChannelDirFirst;
             break;
 
+          case 'P':
+            // gChannelDirFirst = true;
+            gInputFitsFilesTypes = eBlinkImager;
+            break;
+
           case 'o':
             if( optarg ){
                gObsID = atol( optarg );
