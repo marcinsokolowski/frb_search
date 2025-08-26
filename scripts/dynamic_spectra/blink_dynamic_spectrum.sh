@@ -4,6 +4,7 @@
 
 # on SETONIX also :
 # salloc --mem 64g --time 02:00:00 --nodes=1 # request interactive session on CPU node 
+# module use /software/projects/pawsey1154/msok/setonix/2025.08/modules/zen3/gcc/14.2.0
 # module load frb-search/main # load relevant module 
 
 pixel_x=377
