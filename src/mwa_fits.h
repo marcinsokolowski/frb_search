@@ -174,6 +174,15 @@ public :
                      const char* image_template="dirty_image_%dT%d_real.fits",
                      bool bExitOnReadError = true
                    );
+                   
+   int ReadBlinkImages( const char* image_template, // ="wsclean_%d_timeindex%03d-%04d-I-dirty.fits", 
+                        int timestep,
+                        double time_resolution,
+                        int first_second,
+                        int first_coarse_channel, 
+                        int n_coarse_channels=24, 
+                        const char* szDir="./",
+                        bool bExitOnReadError = true );
            
    int ReadFitsCube( const char* fits_list, double freq_lower_mhz, double freq_upper_mhz, 
                      int bAutoDetect=0, int bReadImage=1, int bIgnoreHeaderErrors=0 );
