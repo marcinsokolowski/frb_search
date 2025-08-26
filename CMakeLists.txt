@@ -44,7 +44,7 @@ target_link_libraries(calcstat frbsearchlib msfitslib ${CFITSIO_LIB} ${LIBNOVA_L
 add_executable(dedisperse_fits apps/main_dedisperse_fits.cpp)
 target_link_libraries(dedisperse_fits frbsearchlib msfitslib ${CFITSIO_LIB} ${LIBNOVA_LIB} ${ROOT_LIBRARIES} ${FFTW3_LIB} -ldl -lpthread)
 
-
+install(TARGETS calcstat dedisperse_fits create_dynaspec dynaspec_search RUNTIME DESTINATION bin)
 
 # INSTALLATION:
 # install(TARGETS noise_mapper frbsearchlib calcfits_bg dump_lc avg_images homeopatic_avg image_differencer ux2sid_file ux2sid sid2ux radec2azh date2date print_sun flip_vertical flip_horizontal create_dynaspec dynaspec_search RUNTIME DESTINATION bin)
