@@ -52,6 +52,9 @@ if [[ -n "$9" && "$9" != "-" ]]; then
    start_second=$9
 fi
 
+echo "mkdir -p $outdir"
+mkdir -p $outdir
+
 echo "create_dynaspec -p \"(${pixel_x},${pixel_y})\" -o ${obsid} -S ${start_second} -f start_time_%d_int_%02d_coarse_%03d_fine_ch%02d_image_real.fits -v 10 -N ${n_fine_ch} -X ${timeres} -I 1 -C ${first_coarse_channel} -T ./ -t ${n_times} -d ${outdir} -P "
 create_dynaspec -p "(${pixel_x},${pixel_y})" -o ${obsid} -S ${start_second} -f start_time_%d_int_%02d_coarse_%03d_fine_ch%02d_image_real.fits -v 10 -N ${n_fine_ch} -X ${timeres} -I 1 -C ${first_coarse_channel} -T ./ -t ${n_times} -d ${outdir} -P 
 
