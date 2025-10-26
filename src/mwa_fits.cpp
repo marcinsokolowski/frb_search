@@ -1531,7 +1531,7 @@ bool CMWADataCube::GenerateMetaData( CBgFits& dyna_spec, CDedispSearch& dedisp, 
    m_Metafits = new CBgFits( "GENERATED" );
    m_Metafits->inttime = dyna_spec.inttime;   
    
-   printf("DEBUG parameters : inttime = %.4f [sec] , start_freq = %.4f [MHz]\n",m_Metafits->inttime,dyna_spec.start_freq);
+   printf("DEBUG parameters (from METAFITS) : inttime = %.4f [sec] , start_freq = %.4f [MHz]\n",m_Metafits->inttime,dyna_spec.start_freq);
    
    if( start_freq < 0 ){
       start_freq= dyna_spec.start_freq;

@@ -62,6 +62,8 @@ enum eDTSSearchType { eNoSearch=0, eNormalSearch=1 };
 // do search or not :
 eDTSSearchType gSearchType=eNormalSearch;
 
+double gTimeResolutionInSec=-1;
+
 void usage()
 {
    printf("dynspec_search FITS_FILE_DYNA-SPEC OUT_FITS_FILE -l MIN_DM -m MAX_DM -s DM_STEP -t TIME_STEPS -n THRESHOLD_IN_SIGMA -b BORDER -o OBSID -a AVERAGE_N_TIMESTEPS\n");
@@ -88,13 +90,14 @@ void usage()
    printf("\t-B START_FREQ_MHZ : center of the first channel (can be taken from FITS header) for MWA : coarse_channel*1.284, for EDA2/AAVS2 single channel : [ coarse_channel-16/27 ]*(400/512)\n");
    printf("\t-E COARSE CHANNEL [default %d]\n",gCoarseChannel);
    printf("\t-I TELESCOPE_TYPE : 1-MWA [default], 2 - EDA2/AAVS2, 0 - unknown [default %d]\n",gTelescopeType);
+   printf("\t-Z TimeResSec : default taken from FITS file, but can be overwritten with this parameter\n");
 
    exit(-1);
 }
 
 
 void parse_cmdline(int argc, char * argv[]) {
-   char optstring[] = "a:ho:l:m:s:t:n:N:b:d:o:L:Xw:rAD:TxF:fS:C:B:I:E:P:";
+   char optstring[] = "a:ho:l:m:s:t:n:N:b:d:o:L:Xw:rAD:TxF:fS:C:B:I:E:P:Z:";
    int opt,opt_param,i;
         
    while ((opt = getopt(argc, argv, optstring)) != -1) {
@@ -248,6 +251,12 @@ void parse_cmdline(int argc, char * argv[]) {
             gTransposedFits = true;
             break;
 
+         case 'Z':
+            if( optarg ){
+               gTimeResolutionInSec = atof( optarg );
+            }
+            break;
+
          case 'h':
             usage();
             break;
@@ -319,6 +328,7 @@ void print_parameters()
 //   printf("Start coarse channel = %d\n",gCoarseChannel);   
 //   printf("Time resolution      = %.6f [sec]\n",gTimeResolutionInSec);
    printf("Frequency resolution = %.20f [MHz]\n",MWA_COARSE_CHANNEL);
+   printf("Time resolution      = %.6f [sec]\n",gTimeResolutionInSec);
    printf("Allow for pre-start arrival times = %d\n",CDedispSearch::m_bAllowPreStartArrivals);  
    printf("#####################################\n");   
 }
@@ -412,6 +422,10 @@ int main(int argc,char* argv[])
   double inttime = dyna_spec.inttime;
   if( dedisp.m_MWADataCube.m_Metafits ){
      inttime = (dedisp.m_MWADataCube.m_Metafits)->inttime;
+  }
+  if( gTimeResolutionInSec > 0 ){
+     inttime = gTimeResolutionInSec;
+     (dedisp.m_MWADataCube.m_Metafits)->inttime = inttime;
   }
   dedisp.CalcTemplatesExact( dyna_spec );
   
